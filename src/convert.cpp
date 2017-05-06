@@ -2,6 +2,7 @@
 #include <string>
 #include <ctime>
 #include <iostream>
+#include <cstdlib>
 
 using namespace std;
 
@@ -58,9 +59,9 @@ void convert(ifstream &in, ofstream &out) {
   do {
     getline(im_in, line);
   } while(line.empty() || line[0] < '0' || line[0] > '9');
-  size_t pos;
-  meta.width = stoi(line, &pos);
-  meta.height = stoi(line.substr(pos));
+  char *pos;
+  meta.width = strtol(line.c_str(), &pos, 10);
+  meta.height = strtol(pos, NULL, 10);
   do {
     getline(im_in, line);
   } while(line.empty() || line[0] < '0' || line[0] > '9');
