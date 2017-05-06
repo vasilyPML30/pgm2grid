@@ -74,9 +74,9 @@ void convert(ifstream &in, ofstream &out) {
     float32 thresh = pixel / 255.0;
     int8 value;
     if (thresh >= occ)
-      value = 100;
+      value = (negate ? 0 : 100);
     else if (thresh <= free)
-      value = 0;
+      value = (negate ? 100 : 0);
     else
       value = -1;
     out.put(value);
