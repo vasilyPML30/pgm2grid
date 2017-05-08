@@ -7,6 +7,7 @@
 typedef double float64;
 typedef float float32;
 typedef uint32_t uint32;
+typedef int32_t int32;
 typedef char int8;
 typedef unsigned char uint8;
 

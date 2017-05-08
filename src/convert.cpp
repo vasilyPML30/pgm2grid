@@ -3,6 +3,7 @@
 #include <ctime>
 #include <iostream>
 #include <cstdlib>
+#include <functional>
 
 using namespace std;
 
@@ -26,12 +27,13 @@ void print(RosHeader &header, MapMetaData meta) {
 }
 
 void convert(ifstream &in, ofstream &out) {
+  char format;
   string image;
   string param;
   int negate = false;
   float32 occ, free;
-  RosHeader header = {0, (uint32)time(0), 0, "0"};
-  MapMetaData meta = {(uint32)time(0), 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+  RosHeader header = {0, 0, 0, "0"};
+  MapMetaData meta = {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0};
   while (in >> param) {
     if (param == "image:")
       in >> image;
@@ -58,6 +60,10 @@ void convert(ifstream &in, ofstream &out) {
   string line;
   do {
     getline(im_in, line);
+  } while(line.empty() || line[0] != 'P');
+  format = line[1];
+  do {
+    getline(im_in, line);
   } while(line.empty() || line[0] < '0' || line[0] > '9');
   char *pos;
   meta.width = strtol(line.c_str(), &pos, 10);
@@ -70,8 +76,15 @@ void convert(ifstream &in, ofstream &out) {
   out.write((char *) &meta, sizeof(meta));
 
   for (uint32 i = 0; i < meta.width * meta.height; ++i) {
-    uint8 pixel = im_in.get();
-    float32 thresh = pixel / 255.0;
+    uint8 pixel;
+    if (format == '5')
+      pixel = im_in.get();
+    else {
+      int32 pix;
+      im_in >> pix;
+      pixel = pix;
+    }
+    float32 thresh = (255 - pixel) / 255.0;
     int8 value;
     if (thresh >= occ)
       value = (negate ? 0 : 100);
